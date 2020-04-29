@@ -40,7 +40,7 @@ public class FishPlugin : ModuleRules
 				"SlateCore",
 				"RHI",
 				"RenderCore",
-				"OceanShaderPlugin",
+				"OceanPlugin",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -22,7 +22,7 @@
   ],
   "Plugins": [
     {
-      "Name": "OceanShaderPlugin",
+      "Name": "OceanPlugin",
       "Enabled": true
     }
   ]
