@@ -35,10 +35,7 @@ class FISHPLUGIN_API AFlockFish : public APawn
 	GENERATED_UCLASS_BODY()
 
 	// Current state of the Fish
-	class FishState* currentState;
-
-	/** Static mesh component */
-	class UStaticMeshComponent* base;
+	class FishState* CurrentState;
 
 	/** Fish interaction sphere */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction, meta = (AllowPrivateAccess = "true"))
@@ -47,51 +44,51 @@ class FISHPLUGIN_API AFlockFish : public APawn
 public:
 	// Is this fish a leader
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	bool isLeader;
+	bool bIsLeader;
 
 	// Enemies that fish will flee from
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	TArray<UClass*> enemyTypes;
+	TArray<UClass*> EnemyTypes;
 
 	// Prey that the fish will attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	TArray<UClass*> preyTypes;
+	TArray<UClass*> PreyTypes;
 
 	// Neighbor type of the fish ( typically itself, but needed for code atm)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	UClass* neighborType;
+	UClass* NeighborType;
 
 	// Distance to that fish will try to remain behind leader
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	float followDist;
+	float FollowDist;
 
-	// Defualt Speed
+	// Default Speed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	float speed;
+	float Speed;
 
 	// Max Speed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	float maxSpeed;
+	float MaxSpeed;
 
 	// Speed at which the fish turns (Try to have predators be slightly faster)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	float turnSpeed;
+	float TurnSpeed;
 
 	// Frequency of turning ( turn every "turnFrequency" seconds)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	float turnFrequency;
+	float TurnFrequency;
 
 	// time after eating until it is hungry again
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	float hungerResetTime;
+	float HungerResetTime;
 
 	// Go faster when fish is this distance behind leader
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
-	float distBehindSpeedUpRange;
+	float DistanceBehindSpeedUpRange;
 
 	// Multiplies With Radius of Fish Interaction Sphere for neighbor seperation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Advanced Settings")
-	float SeperationDistanceMultiplier;
+	float SeparationDistanceMultiplier;
 
 	// Multiplies With Radius of Fish Interaction Sphere for Flee Distance
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Advanced Settings")
@@ -119,15 +116,15 @@ public:
 
 	// Player the fish will avoid
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Environment Variables")
-	UClass* playerType;
+	UClass* PlayerType;
 
 	// volume that is considered underwater
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Environment Variables")
-	FVector underwaterMin;
+	FVector UnderwaterMin;
 
 	// volume that is considered underwater
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Environment Variables")
-	FVector underwaterMax;
+	FVector UnderwaterMax;
 
 	// Custom Z range for targeting (NULL will use full range of min/max)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Environment Variables")
@@ -146,7 +143,7 @@ public:
 	float UpdateEveryTick;
 
 	// This is the target the fish will path to
-	FVector target;
+	FVector TargetLocation;
 
 	float InteractionSphereRadius;
 
@@ -156,17 +153,17 @@ public:
 
 	// Flee distance
 	// NOTE: CURRENTLY SET IN CODE
-	float fleeDistance;
+	float FleeDistance;
 
 	// Weight to multiply with cohesion
 	// NOTE: CURRENTLY SET IN CODE
-	float neighborSeperation;
+	float NeighborSeparation;
 
 	// current speed
-	float curSpeed;
+	float CurrentSpeed;
 
 	// This fish's leader
-	AActor *leader;
+	AActor* Leader;
 
 	// current prey in world
 	//TArray<AActor*> prey;
@@ -175,29 +172,29 @@ public:
 	//TArray<AActor*> enemies;
 
 	// These are the fish's flocking buddies
-	TArray<AActor*> neighbors;
+	TArray<AActor*> Neighbors;
 
 	// Nearby Enemies
-	TArray<AActor*> nearbyEnemies;
+	TArray<AActor*> NearbyEnemies;
 
 	// Nearby Prey
-	TArray<AActor*> nearbyPrey;
+	TArray<AActor*> NearbyPrey;
 
-	// Nearby Friends (non-threatning fish and neighbors)
-	TArray<AActor*> nearbyFriends;
+	// Nearby Friends (non-threatening fish and neighbors)
+	TArray<AActor*> NearbyFriends;
 
 	// Flee target
-	AActor *fleeTarget;
+	AActor* FleeTarget;
 
 	// current prey
-	AActor *preyTarget;
+	AActor* PreyTarget;
 
 	// is fish currently fleeing
 	// Current state of the Fish
-	bool isFleeing;
+	bool bIsFleeing;
 
 	// is the fish currently full?
-	bool isFull;
+	bool bIsFull;
 
 	/* bounds of underwater box*/
 	float underwaterBoxLength;
@@ -215,93 +212,98 @@ public:
 	float minZ;
 
 	// Getters and Setters
-	FVector getSeekTarget()
+	FVector GetSeekTarget()
 	{
-		return target;
+		return TargetLocation;
 	}
 
-	void setState(class FishState* newState)
+	void SetState(class FishState* NewState)
 	{
-		currentState = newState;
+		CurrentState = NewState;
 	}
 
-	void setRotation(FRotator newRotation)
+	void SetRotation(FRotator NewRotation)
 	{
-		curRotation = newRotation;
+		CurrentRotation = NewRotation;
 	};
 
-	void setVelocity(FVector newVelocity)
+	void SetVelocity(FVector NewVelocity)
 	{
-		curVelocity = newVelocity;
+		CurrentVelocity = NewVelocity;
 	};
 
-	FRotator getRotation()
+	FRotator GetFlockRotation()
 	{
-		return curRotation;
+		return CurrentRotation;
 	};
 
-	FVector getVelocity()
+	FVector GetFlockVelocity()
 	{
-		return curVelocity;
+		return CurrentVelocity;
 	};
 
 protected:
+
+	/** Static mesh component */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Components")
+    class UStaticMeshComponent* BaseMesh;
+	
 	/** Overrided tick function */
-	virtual void Tick(float delta) override;
+	virtual void Tick(float DeltaTime) override;
 
 	/* setup the game on first tick */
 	void Setup();
 
 	/* Manage the various necessary timers*/
-	void ManageTimers(float delta);
+	void ManageTimers(float DeltaTime);
 
 	/* Choose what state to be in*/
 	void ChooseState();
 
 	/* Move Bounds */
-	void MoveBounds(float delta);
+	void MoveBounds(float DeltaTime);
 
 	UFUNCTION()
-	void OnBeginOverlap(UPrimitiveComponent* activatedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult);
+	void OnBeginOverlap(UPrimitiveComponent* ActivatedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnEndOverlap(UPrimitiveComponent* activatedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
+	void OnEndOverlap(UPrimitiveComponent* ActivatedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
 
 	/* update the current state*/
-	void UpdateState(float delta);
+	void UpdateState(float DeltaTime);
 
 	/* places the target randomly within the postprocessvolume*/
-	void spawnTarget();
+	void SpawnTarget();
 
 	/* Does a bunch of debug stuff if debug mode is active*/
 	void Debug();
 
 	// current velocity
-	FVector curVelocity;
+	FVector CurrentVelocity;
 
 	// current rotation
-	FRotator curRotation;
+	FRotator CurrentRotation;
 
 	// turning timer
-	float turnTimer;
+	float TurnTimer;
 
 	// Are the array's setup?
-	bool isSetup;
+	bool bIsSetup;
 
 	// current hunger timer
-	float hungerTimer;
+	float HungerTimer;
 
 	// Tick Timer
-	float updateTimer;
+	float UpdateTimer;
 
 	// player holder
 	//AActor* player;
 
 	// has fish manager?
-	bool hasFishManager;
+	bool bHasFishManager;
 
 	// fish manager
-	AActor* fishManager;
+	AActor* FishManager;
 
 
 };

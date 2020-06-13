@@ -38,27 +38,27 @@ public:
 
 	// Type of flocks to spawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	TArray<UClass*> flockTypes;
+	TArray<UClass*> FlockTypes;
 
 	// # of fish in respective flock
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	TArray<float> numInFlock;
+	TArray<float> NumInFlock;
 
 	// min Z of volume that is considered underwater
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	float minZ = -9000.0f;
+	float MinZ = -9000.0f;
 
 	// max Z of volume that is considered underwater
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	float maxZ = -950.0f;
+	float MaxZ = -950.0f;
 	
 	// Length of underwater box
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	float underwaterBoxLength = 10000;
+	float UnderwaterBoxLength = 10000;
 
 	// Attach fish manager to player?
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	bool attachToPlayer = false;
+	bool AttachToPlayer = false;
 
 	// Player Type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
@@ -66,16 +66,16 @@ public:
 
 	// Player Type
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Config)
-	UClass* playerType;
+	UClass* PlayerType;
 
 	// Player
-	AActor* player;
+	AActor* PlayerReference;
 
 	// get min z
-	float getMinZ();
+	float GetMinZ();
 
 	// get min z
-	float getMaxZ();
+	float GetMaxZ();
 
 	/** Constructor */
 	AFishManager(const FObjectInitializer& ObjectInitializer);
@@ -86,20 +86,20 @@ protected:
 	virtual void Tick(float val) override;
 
 	/** setup the fish manager */
-	void setup();
+	void Setup();
 
 	/** move fish manager to player */
-	void moveToPlayer();
+	void MoveToPlayer();
 
 	/* max bounds of water*/
-	float maxX;
-	float maxY;
-	float minX;
-	float minY;
+	float MaxX;
+	float MaxY;
+	float MinX;
+	float MinY;
 
 	// is set up?
-	bool isSetup = false;
+	bool bIsSetup = false;
 
 	// Are fish spawned?
-	bool areFishSpawned = false;
+	bool bAreFishSpawned = false;
 };
