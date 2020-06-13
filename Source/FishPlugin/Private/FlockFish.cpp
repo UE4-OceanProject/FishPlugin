@@ -33,8 +33,8 @@
 
 AFlockFish::AFlockFish(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	base = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("FishMesh"));
-	RootComponent = base;
+	BaseMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("FishMesh"));
+	RootComponent = BaseMesh;
 
 	// Fish interaction sphere
 	FishInteractionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("FishInteractionSphere"));
@@ -43,51 +43,51 @@ AFlockFish::AFlockFish(const class FObjectInitializer& ObjectInitializer) : Supe
 	FishInteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AFlockFish::OnBeginOverlap);
 	FishInteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AFlockFish::OnEndOverlap);
 
-	if (isLeader == true)
+	if (bIsLeader == true)
 	{
-		spawnTarget();
+		SpawnTarget();
 	}
 
 	//Defaults
-	followDist = 50.0;
-	speed = 1200.0;
-	maxSpeed = 2400.0;
-	turnSpeed = 3.0;
-	turnFrequency = 1.0;
-	turnFrequency = 1.0;
-	hungerResetTime = 20.0;
-	distBehindSpeedUpRange = 3000.0;
-	SeperationDistanceMultiplier = 0.75;
+	FollowDist = 50.0;
+	Speed = 1200.0;
+	MaxSpeed = 2400.0;
+	TurnSpeed = 3.0;
+	TurnFrequency = 1.0;
+	TurnFrequency = 1.0;
+	HungerResetTime = 20.0;
+	DistanceBehindSpeedUpRange = 3000.0;
+	SeparationDistanceMultiplier = 0.75;
 	FleeDistanceMultiplier = 5.0;
 	FleeAccelerationMultiplier = 2.0;
 	ChaseAccelerationMultiplier = 2.0;
 	SeekDecelerationMultiplier = 1.0;
 	AvoidForceMultiplier = 1.0;
 	AvoidanceForce = 20000.0;
-	underwaterMin = FVector(-40000, -40000, -9000);
-	underwaterMax = FVector(40000, 40000, -950);
+	UnderwaterMin = FVector(-40000, -40000, -9000);
+	UnderwaterMax = FVector(40000, 40000, -950);
 	CustomZSeekMin = 0.0;
 	CustomZSeekMax = 0.0;
 	NumNeighborsToEvaluate = 5.0;
 	UpdateEveryTick = 0.0;
 	DebugMode = true;
-	fleeDistance = 0.0;
-	neighborSeperation = 300.0;
-	curSpeed = speed;
-	isFleeing = false;
-	isFull = false;
+	FleeDistance = 0.0;
+	NeighborSeparation = 300.0;
+	CurrentSpeed = Speed;
+	bIsFleeing = false;
+	bIsFull = false;
 	underwaterBoxLength = 10000.0;
 	AvoidanceDistance = 5000.0;
-	curVelocity = FVector(0, 0, 0);
-	curRotation = FRotator(0, 0, 0);
-	turnTimer = 0.0;
-	isSetup = false;
-	hungerTimer = 0.0;
-	updateTimer = 0.0;
-	hasFishManager = false;
+	CurrentVelocity = FVector(0, 0, 0);
+	CurrentRotation = FRotator(0, 0, 0);
+	TurnTimer = 0.0;
+	bIsSetup = false;
+	HungerTimer = 0.0;
+	UpdateTimer = 0.0;
+	bHasFishManager = false;
 }
 
-void AFlockFish::Tick(float delta)
+void AFlockFish::Tick(float DeltaTime)
 {
 
 	// Setup the fish (happens on first tick only)
@@ -98,22 +98,22 @@ void AFlockFish::Tick(float delta)
 	Debug();
 
 	// Move Bounds based on location of FishManager (if applicable)
-	MoveBounds(delta);
+	MoveBounds(DeltaTime);
 
 	// Manage Timers (hungerTimer, updateTimer, and turnTimer)
-	ManageTimers(delta);
+	ManageTimers(DeltaTime);
 
 	// Decide what state to be in
 	ChooseState();
 
 	// Update curVelocity and curRotation through current state
-	UpdateState(delta);
+	UpdateState(DeltaTime);
 
 	// Update world rotation and velocity
-	this->SetActorRotation(curRotation);
-	this->AddActorWorldOffset(curVelocity);
+	this->SetActorRotation(CurrentRotation);
+	this->AddActorWorldOffset(CurrentVelocity);
 
-	Super::Tick(delta);
+	Super::Tick(DeltaTime);
 }
 
 void AFlockFish::Debug()
@@ -134,11 +134,11 @@ void AFlockFish::Debug()
 			);
 
 		FColor indicatorColor = FColor::Cyan;
-		if (nearbyEnemies.IsValidIndex(0))
+		if (NearbyEnemies.IsValidIndex(0))
 		{
 			indicatorColor = FColor::Red;
 		}
-		else if (nearbyPrey.IsValidIndex(0) && isFull == false)
+		else if (NearbyPrey.IsValidIndex(0) && bIsFull == false)
 		{
 			indicatorColor = FColor::Green;
 		}
@@ -209,170 +209,170 @@ FVector AFlockFish::AvoidObstacle()
 	return FVector(0, 0, 0);
 }
 
-void AFlockFish::UpdateState(float delta)
+void AFlockFish::UpdateState(float DeltaTime)
 {
 	if (UpdateEveryTick == 0)
 	{
-		currentState->Update(delta);
+		CurrentState->Update(DeltaTime);
 	}
-	else if (updateTimer >= UpdateEveryTick)
+	else if (UpdateTimer >= UpdateEveryTick)
 	{
-		currentState->Update(delta);
-		updateTimer = 0;
+		CurrentState->Update(DeltaTime);
+		UpdateTimer = 0;
 	}
 }
 
 
-void AFlockFish::OnBeginOverlap(UPrimitiveComponent* activatedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
+void AFlockFish::OnBeginOverlap(UPrimitiveComponent* ActivatedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// Is overlapping with enemy?
-	if (enemyTypes.Find(otherActor->GetClass()) >= 0)
+	if (EnemyTypes.Find(OtherActor->GetClass()) >= 0)
 	{	
-		nearbyEnemies.Add(otherActor);
+		NearbyEnemies.Add(OtherActor);
 	}
-	else if (preyTypes.Find(otherActor->GetClass()) >= 0)
+	else if (PreyTypes.Find(OtherActor->GetClass()) >= 0)
 	{	
-		if (otherActor->GetClass() == this->GetClass())
+		if (OtherActor->GetClass() == this->GetClass())
 		{
-			if (!Cast<AFlockFish>(otherActor)->isLeader)
+			if (!Cast<AFlockFish>(OtherActor)->bIsLeader)
 			{
-				nearbyPrey.Add(otherActor);
+				NearbyPrey.Add(OtherActor);
 			}
 		}
 		else
 		{
-			nearbyPrey.Add(otherActor);
+			NearbyPrey.Add(OtherActor);
 		}
 	}
-	else if (otherActor->GetClass() == this->GetClass())
+	else if (OtherActor->GetClass() == this->GetClass())
 	{
-		nearbyFriends.Add(otherActor);
+		NearbyFriends.Add(OtherActor);
 	}
 }
 
-void AFlockFish::OnEndOverlap(UPrimitiveComponent* activatedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
+void AFlockFish::OnEndOverlap(UPrimitiveComponent* ActivatedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
 {
-	if (nearbyEnemies.Find(otherActor) >= 0)
+	if (NearbyEnemies.Find(OtherActor) >= 0)
 	{
-		nearbyEnemies.Remove(otherActor);
+		NearbyEnemies.Remove(OtherActor);
 	}
-	else if (nearbyPrey.Find(otherActor) >= 0)
+	else if (NearbyPrey.Find(OtherActor) >= 0)
 	{
-		nearbyPrey.Remove(otherActor);
+		NearbyPrey.Remove(OtherActor);
 	}
-	else if (nearbyFriends.Find(otherActor) >= 0)
+	else if (NearbyFriends.Find(OtherActor) >= 0)
 	{
-		nearbyFriends.Remove(otherActor);
+		NearbyFriends.Remove(OtherActor);
 	}
 }
 
 void AFlockFish::ChooseState()
 {
-	if (nearbyEnemies.IsValidIndex(0))
+	if (NearbyEnemies.IsValidIndex(0))
 	{
-		currentState = new FleeState(this, nearbyEnemies[0]);
+		CurrentState = new FleeState(this, NearbyEnemies[0]);
 	}
-	else if (nearbyPrey.IsValidIndex(0) && isFull == false)
+	else if (NearbyPrey.IsValidIndex(0) && bIsFull == false)
 	{
-		currentState = new ChaseState(this, nearbyPrey[0]);
+		CurrentState = new ChaseState(this, NearbyPrey[0]);
 	}
 	else
 	{
-		currentState = new SeekState(this);
+		CurrentState = new SeekState(this);
 	}
 }
 
-void AFlockFish::ManageTimers(float delta)
+void AFlockFish::ManageTimers(float DeltaTime)
 {
 	// Check if the fish is full or not
-	if (isFull)
+	if (bIsFull)
 	{
-		hungerTimer += delta;
+		HungerTimer += DeltaTime;
 
-		if (hungerTimer >= hungerResetTime)
+		if (HungerTimer >= HungerResetTime)
 		{
-			hungerTimer = 0.0f;
-			isFull = false;
+			HungerTimer = 0.0f;
+			bIsFull = false;
 		}
 	}
 
 	// decide on wether to move target this tick
-	if (turnTimer >= turnFrequency && isLeader == true)
+	if (TurnTimer >= TurnFrequency && bIsLeader == true)
 	{
-		spawnTarget();
-		turnTimer = 0.0;
+		SpawnTarget();
+		TurnTimer = 0.0;
 	}
 
-	updateTimer += delta;
-	turnTimer += delta;
+	UpdateTimer += DeltaTime;
+	TurnTimer += DeltaTime;
 }
 
 
 
-void AFlockFish::MoveBounds(float delta)
+void AFlockFish::MoveBounds(float DeltaTime)
 {
-	if (hasFishManager)
+	if (bHasFishManager)
 	{
-		FVector fishManagerPosition = fishManager->GetActorLocation();
+		FVector fishManagerPosition = FishManager->GetActorLocation();
 		maxX = fishManagerPosition.X + underwaterBoxLength;
 		minX = fishManagerPosition.X - underwaterBoxLength;
 		maxY = fishManagerPosition.Y + underwaterBoxLength;
 		minY = fishManagerPosition.Y - underwaterBoxLength;
 
-		FVector actorLocation = this->GetActorLocation();
-		if (actorLocation.Z > underwaterMax.Z)
+		FVector ActorLocation = this->GetActorLocation();
+		if (ActorLocation.Z > UnderwaterMax.Z)
 		{	
-			actorLocation.Z = underwaterMin.Z + FMath::Abs((0.999 * underwaterMax.Z));
+			ActorLocation.Z = UnderwaterMin.Z + FMath::Abs((0.999 * UnderwaterMax.Z));
 		}
-		else if (actorLocation.Z < underwaterMin.Z)
+		else if (ActorLocation.Z < UnderwaterMin.Z)
 		{
-			actorLocation.Z = underwaterMin.Z + FMath::Abs((0.001 * underwaterMax.Z));
+			ActorLocation.Z = UnderwaterMin.Z + FMath::Abs((0.001 * UnderwaterMax.Z));
 		}
 
-		if (actorLocation.X > maxX)
+		if (ActorLocation.X > maxX)
 		{
-			actorLocation.X = minX + FMath::Abs((0.1 * maxX));
+			ActorLocation.X = minX + FMath::Abs((0.1 * maxX));
 		}
-		else if (actorLocation.X < minX)
+		else if (ActorLocation.X < minX)
 		{
-			actorLocation.X = maxX - FMath::Abs((0.1 * maxX));
-		}
-
-		if (actorLocation.Y > maxY)
-		{
-			actorLocation.Y = minY + FMath::Abs((0.1 * maxY));
-		}
-		else if (actorLocation.Y < minY)
-		{
-			actorLocation.Y = maxY - FMath::Abs((0.1 * maxY));
+			ActorLocation.X = maxX - FMath::Abs((0.1 * maxX));
 		}
 
-		this->SetActorLocation(actorLocation);
+		if (ActorLocation.Y > maxY)
+		{
+			ActorLocation.Y = minY + FMath::Abs((0.1 * maxY));
+		}
+		else if (ActorLocation.Y < minY)
+		{
+			ActorLocation.Y = maxY - FMath::Abs((0.1 * maxY));
+		}
+
+		this->SetActorLocation(ActorLocation);
 	}
 }
 
-void AFlockFish::spawnTarget()
+void AFlockFish::SpawnTarget()
 {
-	target = FVector(FMath::FRandRange(minX, maxX), FMath::FRandRange(minY, maxY), FMath::FRandRange(minZ, maxZ));
+	TargetLocation = FVector(FMath::FRandRange(minX, maxX), FMath::FRandRange(minY, maxY), FMath::FRandRange(minZ, maxZ));
 }
 
 
 void AFlockFish::Setup()
 {
 	// Setup the enemies list on first tick
-	if (isSetup == false)
+	if (bIsSetup == false)
 	{
-		maxX = underwaterMax.X;
-		maxY = underwaterMax.Y;
-		minX = underwaterMin.X;
-		minY = underwaterMin.Y;
+		maxX = UnderwaterMax.X;
+		maxY = UnderwaterMax.Y;
+		minX = UnderwaterMin.X;
+		minY = UnderwaterMin.Y;
 
 		InteractionSphereRadius = FishInteractionSphere->GetScaledSphereRadius();
 
 		if (CustomZSeekMax == 0.0)
 		{
-			minZ = underwaterMin.Z;
-			maxZ = underwaterMax.Z;
+			minZ = UnderwaterMin.Z;
+			maxZ = UnderwaterMax.Z;
 		}
 		else
 		{
@@ -380,31 +380,31 @@ void AFlockFish::Setup()
 			maxZ = CustomZSeekMax;
 		}
 
-		fleeDistance = FishInteractionSphere->GetScaledSphereRadius() * FleeDistanceMultiplier;
-		neighborSeperation = FishInteractionSphere->GetScaledSphereRadius() * SeperationDistanceMultiplier;
+		FleeDistance = FishInteractionSphere->GetScaledSphereRadius() * FleeDistanceMultiplier;
+		NeighborSeparation = FishInteractionSphere->GetScaledSphereRadius() * SeparationDistanceMultiplier;
 		AvoidanceDistance = FishInteractionSphere->GetScaledSphereRadius() * 2;
 
-		currentState = new SeekState(this);
+		CurrentState = new SeekState(this);
 
 		TArray<AActor*> aFishManagerList;
 		UGameplayStatics::GetAllActorsOfClass(this, AFishManager::StaticClass(), aFishManagerList);
 		if (aFishManagerList.Num() > 0)
 		{
-			hasFishManager = true;
-			fishManager = aFishManagerList[0];
+			bHasFishManager = true;
+			FishManager = aFishManagerList[0];
 		}
 
 		// Setup Neighbors
-		if (!fishManager)
+		if (!FishManager)
 		{
 			TArray<AActor*> aNeighborList;
-			UGameplayStatics::GetAllActorsOfClass(this, neighborType, aNeighborList);
-			neighbors.Append(aNeighborList);
-			for (int i = 0; i < neighbors.Num(); i++)
+			UGameplayStatics::GetAllActorsOfClass(this, NeighborType, aNeighborList);
+			Neighbors.Append(aNeighborList);
+			for (int i = 0; i < Neighbors.Num(); i++)
 			{
-				if (Cast<AFlockFish>(neighbors[i])->isLeader)
+				if (Cast<AFlockFish>(Neighbors[i])->bIsLeader)
 				{
-					leader = neighbors[i];
+					Leader = Neighbors[i];
 					break;
 				}
 			}
@@ -412,6 +412,6 @@ void AFlockFish::Setup()
 		//nearbyFriends.Append(neighbors);
 
 
-		isSetup = true;
+		bIsSetup = true;
 	}
 }

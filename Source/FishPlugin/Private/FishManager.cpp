@@ -31,83 +31,83 @@ AFishManager::AFishManager(const FObjectInitializer& ObjectInitializer) : Super(
 
 void AFishManager::Tick(float val)
 {
-	setup();
+	Setup();
 
-	if (attachToPlayer)
+	if (AttachToPlayer)
 	{
-		moveToPlayer();
+		MoveToPlayer();
 	}
 }
 
-void AFishManager::moveToPlayer()
+void AFishManager::MoveToPlayer()
 {
-	if (player)
-		this->SetActorLocation(player->GetActorLocation());
+	if (PlayerReference)
+		this->SetActorLocation(PlayerReference->GetActorLocation());
 }
 
-float AFishManager::getMinZ()
+float AFishManager::GetMinZ()
 {
-	return minZ;
+	return MinZ;
 }
 
-float AFishManager::getMaxZ()
+float AFishManager::GetMaxZ()
 {
-	return maxZ;
+	return MaxZ;
 }
 
-void AFishManager::setup()
+void AFishManager::Setup()
 {
-	if (isSetup == false){
-		if (!areFishSpawned)
+	if (bIsSetup == false){
+		if (!bAreFishSpawned)
 		{
-			maxX = GetActorLocation().X + underwaterBoxLength;
-			maxY = GetActorLocation().Y + underwaterBoxLength;
-			minX = GetActorLocation().X - underwaterBoxLength;
-			minY = GetActorLocation().Y - underwaterBoxLength;
+			MaxX = GetActorLocation().X + UnderwaterBoxLength;
+			MaxY = GetActorLocation().Y + UnderwaterBoxLength;
+			MinX = GetActorLocation().X - UnderwaterBoxLength;
+			MinY = GetActorLocation().Y - UnderwaterBoxLength;
 
 			UWorld* const world = GetWorld();
-			int numFlocks = flockTypes.Num();
+			int numFlocks = FlockTypes.Num();
 			for (int i = 0; i < numFlocks; i++)
 			{
-				FVector spawnLoc = FVector(FMath::FRandRange(minX, maxX), FMath::FRandRange(minY, maxY), FMath::FRandRange(minZ, maxZ));
-				AFlockFish *leaderFish = NULL;
-				for (int j = 0; j < numInFlock[i]; j++)
+				FVector spawnLoc = FVector(FMath::FRandRange(MinX, MaxX), FMath::FRandRange(MinY, MaxY), FMath::FRandRange(MinZ, MaxZ));
+				AFlockFish *leaderFish = nullptr;
+				for (int j = 0; j < NumInFlock[i]; j++)
 				{
-					AFlockFish *aFish = Cast<AFlockFish>(world->SpawnActor(flockTypes[i]));
-					aFish->isLeader = false;
+					AFlockFish *aFish = Cast<AFlockFish>(world->SpawnActor(FlockTypes[i]));
+					aFish->bIsLeader = false;
 					aFish->DebugMode = DebugMode;
-					aFish->underwaterMax = FVector(maxX, maxY, maxZ);
-					aFish->underwaterMin = FVector(minX, minY, minZ);
-					aFish->underwaterBoxLength = underwaterBoxLength;
-					spawnLoc = FVector(FMath::FRandRange(minX, maxX), FMath::FRandRange(minY, maxY), FMath::FRandRange(minZ, maxZ));
+					aFish->UnderwaterMax = FVector(MaxX, MaxY, MaxZ);
+					aFish->UnderwaterMin = FVector(MinX, MinY, MinZ);
+					aFish->underwaterBoxLength = UnderwaterBoxLength;
+					spawnLoc = FVector(FMath::FRandRange(MinX, MaxX), FMath::FRandRange(MinY, MaxY), FMath::FRandRange(MinZ, MaxZ));
 					if (j == 0)
 					{
-						aFish->isLeader = true;
+						aFish->bIsLeader = true;
 						leaderFish = aFish;
 					}
-					else if (leaderFish != NULL)
+					else if (leaderFish != nullptr)
 					{	
-						aFish->leader = leaderFish;
+						aFish->Leader = leaderFish;
 					}
 					aFish->SetActorLocation(spawnLoc);
 				}
 			}
-			areFishSpawned = true;
+			bAreFishSpawned = true;
 		}
 
-		if (attachToPlayer)
+		if (AttachToPlayer)
 		{
 			TArray<AActor*> aPlayerList;
-			UGameplayStatics::GetAllActorsOfClass(this, playerType, aPlayerList);
+			UGameplayStatics::GetAllActorsOfClass(this, PlayerType, aPlayerList);
 			if (aPlayerList.Num() > 0)
 			{	
-				player = aPlayerList[0];
-				isSetup = true;
+				PlayerReference = aPlayerList[0];
+				bIsSetup = true;
 			}
 		} 
 		else
 		{
-			isSetup = true;
+			bIsSetup = true;
 		}
 
 	}

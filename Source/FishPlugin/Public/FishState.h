@@ -43,12 +43,12 @@ protected:
 public:
 	// Constructors
 	FishState(){}
-	FishState(AFlockFish* aFish)
+	FishState(AFlockFish* InFish)
 	{
-		Fish = aFish;
+		Fish = InFish;
 	};
-	virtual void Update(float val){};
-	virtual void HandleOverlapEvent(AActor *otherActor, UPrimitiveComponent *otherComponent, FString aColliderString){};
+	virtual void Update(float DeltaTime){};
+	virtual void HandleOverlapEvent(AActor* OtherActor, UPrimitiveComponent* OtherComponent, FString ColliderString){};
 };
 
 
@@ -62,13 +62,13 @@ class SeekState : public FishState
 {
 public:
 
-	SeekState(AFlockFish* aFish) : FishState(aFish){};
-	virtual void Update(float delta) override;
+	SeekState(AFlockFish* InFish) : FishState(InFish){};
+	virtual void Update(float DeltaTime) override;
 
 protected:
 
-	virtual void SeekTarget(float delta);
-	virtual void Flock(float delta);
+	virtual void SeekTarget(float DeltaTime);
+	virtual void Flock(float DeltaTime);
 };
 
 
@@ -85,15 +85,15 @@ protected:
 
 public:
 
-	FleeState(AFlockFish* aFish, AActor* aEnemy) : FishState(aFish)
+	FleeState(AFlockFish* InFish, AActor* InEnemy) : FishState(InFish)
 	{
-		Enemy = aEnemy;
+		Enemy = InEnemy;
 	};
-	virtual void Update(float delta) override;
+	virtual void Update(float DeltaTime) override;
 
 protected:
 
-	virtual void FleeFromEnemy(float delta);
+	virtual void FleeFromEnemy(float DeltaTime);
 
 };
 
@@ -111,14 +111,14 @@ protected:
 
 public:
 
-	ChaseState(AFlockFish* aFish, AActor* aPrey) : FishState(aFish)
+	ChaseState(AFlockFish* InFish, AActor* InPrey) : FishState(InFish)
 	{
-		Prey = aPrey;
+		Prey = InPrey;
 	};
-	virtual void Update(float delta) override;
+	virtual void Update(float DeltaTime) override;
 
 protected:
 
-	virtual void ChasePrey(float delta);
+	virtual void ChasePrey(float DeltaTime);
 	virtual void EatPrey();
 };
