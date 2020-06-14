@@ -1,4 +1,5 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// For copyright see LICENSE in EnvironmentProject root dir, or:
+//https://github.com/UE4-OceanProject/OceanProject/blob/Master-Environment-Project/LICENSE
 
 using UnrealBuildTool;
 
@@ -6,8 +7,8 @@ public class FishPlugin : ModuleRules
 {
 	public FishPlugin(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
@@ -26,6 +27,7 @@ public class FishPlugin : ModuleRules
 			new string[]
 			{
 				"Core",
+				"OceanPlugin"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -36,10 +38,6 @@ public class FishPlugin : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"Slate",
-				"SlateCore",
-				"RHI",
-				"RenderCore",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
@@ -51,5 +49,8 @@ public class FishPlugin : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
+
+		// Make sure UBT reminds us of how to keep the project IWYU compliant
+		bEnforceIWYU = true;
 	}
 }
