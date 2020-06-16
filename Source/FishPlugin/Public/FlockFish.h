@@ -15,7 +15,10 @@
 UCLASS()
 class FISHPLUGIN_API AFlockFish : public APawn
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+	AFlockFish(const class FObjectInitializer& ObjectInitializer);
 
 	// Current state of the Fish
 	class FishState* CurrentState;
@@ -24,7 +27,6 @@ class FISHPLUGIN_API AFlockFish : public APawn
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction, meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* FishInteractionSphere;
 
-public:
 	// Is this fish a leader
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fish Attributes")
 	bool bIsLeader;

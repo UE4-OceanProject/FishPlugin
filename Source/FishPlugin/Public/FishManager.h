@@ -15,7 +15,6 @@ UCLASS()
 class AFishManager : public AActor
 {
 	GENERATED_BODY()
-
 	
 public:
 
