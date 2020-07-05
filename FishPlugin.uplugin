@@ -10,6 +10,7 @@
 	"DocsURL": "",
 	"MarketplaceURL": "",
 	"SupportURL": "",
+	"CanContainContent": true,
 	"Modules": [
 		{
 			"Name": "FishPlugin",
